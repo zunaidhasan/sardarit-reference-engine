@@ -1,0 +1,98 @@
+/* Phase 4: AI-Driven Gap Analysis */
+
+.ai-gap-panel .panel-header {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.ai-gap-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  line-height: 1.45;
+}
+.ai-gap-output {
+  min-height: 120px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+.ai-gap-output h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 16px 0 8px;
+}
+.ai-gap-output h3:first-child { margin-top: 0; }
+.ai-gap-output ul {
+  margin: 0 0 8px 18px;
+  padding: 0;
+}
+.ai-gap-output li { margin-bottom: 6px; }
+.ai-gap-output strong { color: var(--text); }
+.ai-gap-output .priority-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.ai-gap-output .priority-tag.high {
+  background: rgba(248, 113, 113, 0.15);
+  color: var(--danger);
+}
+.ai-gap-output .priority-tag.med {
+  background: rgba(251, 191, 36, 0.15);
+  color: var(--warning);
+}
+.ai-gap-output .priority-tag.low {
+  background: rgba(52, 211, 153, 0.15);
+  color: var(--success);
+}
+.ai-gap-output .ai-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.ai-ask-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.ai-ask-row input {
+  flex: 1;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+}
+.ai-ask-row input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.ai-ask-row .btn { flex-shrink: 0; }
+
+.ai-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 20px 0;
+}
+.ai-loading .btn-spinner {
+  display: inline-block !important;
+  width: 16px;
+  height: 16px;
+}
