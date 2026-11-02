@@ -13,7 +13,6 @@
 </head>
 <body>
   <div class="app">
-    <!-- SIDEBAR -->
     <aside class="sidebar">
       <div class="sidebar-brand">
         <div class="brand-mark">S</div>
@@ -57,7 +56,6 @@
       </div>
     </aside>
 
-    <!-- MAIN -->
     <main class="main">
       <header class="topbar">
         <div>
@@ -74,7 +72,6 @@
         </div>
       </header>
 
-      <!-- VIEW: GENERATOR -->
       <section class="view active" id="view-generator">
         <div class="generator-layout">
           <div class="panel">
@@ -94,10 +91,14 @@
 
             <div class="action-row">
               <button class="btn btn-secondary" id="btn-match">
-                <i data-lucide="compass"></i> Match References
+                <i data-lucide="compass"></i>
+                <span class="btn-label">Match References</span>
+                <span class="btn-spinner" hidden></span>
               </button>
               <button class="btn btn-primary" id="btn-proposal">
-                <i data-lucide="wand-2"></i> Draft Proposal
+                <i data-lucide="wand-2"></i>
+                <span class="btn-label">Draft Proposal</span>
+                <span class="btn-spinner" hidden></span>
               </button>
             </div>
           </div>
@@ -117,14 +118,17 @@
         </div>
       </section>
 
-      <!-- VIEW: PORTFOLIO -->
       <section class="view" id="view-portfolio">
         <div class="portfolio-toolbar">
           <div class="search-box">
             <i data-lucide="search"></i>
-            <input type="text" id="portfolio-search" placeholder="Search URL, description, keywords, stack…" />
+            <input type="text" id="portfolio-search" placeholder="Search URL, name, description, keywords, stack…" autocomplete="off" />
+            <button class="search-clear" id="search-clear" title="Clear" hidden>
+              <i data-lucide="x"></i>
+            </button>
           </div>
-          <div class="filters">
+
+          <div class="filters" id="filter-bar">
             <select id="filter-category">
               <option value="">All Categories</option>
             </select>
@@ -133,10 +137,8 @@
             </select>
             <select id="filter-quality">
               <option value="">All Quality</option>
-              <option value="High">High</option>
-              <option value="Medium">Medium</option>
-              <option value="A">A</option>
-              <option value="B">B</option>
+              <option value="High">High / A</option>
+              <option value="Medium">Medium / B</option>
               <option value="C">C</option>
             </select>
             <select id="filter-complexity">
@@ -145,22 +147,48 @@
               <option value="Medium">Medium</option>
               <option value="High">High</option>
             </select>
+            <select id="filter-live">
+              <option value="">Live status</option>
+              <option value="yes">Live only</option>
+              <option value="no">Offline only</option>
+            </select>
           </div>
-          <div class="results-meta">
-            <span id="portfolio-count">0</span> projects
+
+          <div class="toolbar-right">
+            <button class="btn-text" id="btn-clear-filters" hidden>Clear filters</button>
+            <div class="results-meta">
+              <span id="portfolio-count">0</span> projects
+            </div>
+            <div class="view-toggle">
+              <button class="view-btn active" data-layout="grid" title="Grid">
+                <i data-lucide="layout-grid"></i>
+              </button>
+              <button class="view-btn" data-layout="list" title="List">
+                <i data-lucide="list"></i>
+              </button>
+            </div>
           </div>
         </div>
 
-        <div class="portfolio-grid" id="portfolio-grid">
-          <!-- Cards injected by JS -->
+        <div class="active-filters" id="active-filters" hidden></div>
+
+        <div class="portfolio-grid" id="portfolio-grid"></div>
+
+        <div class="portfolio-empty" id="portfolio-empty" hidden>
+          <i data-lucide="search-x"></i>
+          <h3>No projects match</h3>
+          <p>Try different filters or clear the search.</p>
+          <button class="btn btn-secondary" id="btn-empty-clear">Clear all filters</button>
         </div>
 
         <div class="load-more-wrap">
-          <button class="btn btn-secondary" id="btn-load-more" style="display:none">Load more</button>
+          <button class="btn btn-secondary" id="btn-load-more" hidden>
+            <span class="btn-label">Load more</span>
+            <span class="btn-spinner" hidden></span>
+          </button>
         </div>
       </section>
 
-      <!-- VIEW: GAPS (placeholder) -->
       <section class="view" id="view-gaps">
         <div class="placeholder-card">
           <i data-lucide="scan-search"></i>
@@ -169,7 +197,6 @@
         </div>
       </section>
 
-      <!-- VIEW: TESTING (placeholder) -->
       <section class="view" id="view-testing">
         <div class="placeholder-card">
           <i data-lucide="flask-conical"></i>
@@ -178,7 +205,6 @@
         </div>
       </section>
 
-      <!-- VIEW: SETTINGS -->
       <section class="view" id="view-settings">
         <div class="settings-grid">
           <div class="panel">
