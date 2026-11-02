@@ -295,28 +295,71 @@ function saveSettings() {
   toast('Settings saved');
 }
 
+function applyLoadedDB(sourceDB) {
+  const statusDot = document.getElementById('status-dot');
+  if (!sourceDB || !sourceDB.length) {
+    statusDot.classList.remove('loading');
+    document.getElementById('db-status-text').textContent = 'No database found';
+    return;
+  }
+  state.projects = (typeof enrichDatabase === 'function') ? enrichDatabase(sourceDB) : sourceDB;
+  statusDot.classList.remove('loading');
+  statusDot.classList.add('ready');
+  document.getElementById('db-status-text').textContent = 'Database ready';
+  document.getElementById('stat-count').textContent = state.projects.length.toLocaleString();
+  document.getElementById('info-total').textContent = state.projects.length.toLocaleString();
+  const cats = new Set(state.projects.map(p => getField(p, 'Category')).filter(Boolean));
+  document.getElementById('info-categories').textContent = cats.size;
+  populateFilters();
+  console.log('[SardarIT] Loaded', state.projects.length, 'enriched projects');
+}
+
+async function loadDatabaseFallback() {
+  const urls = [
+    'https://cdn.jsdelivr.net/gh/zunaidhasan/Refactor-proposal-generator@main/database.js',
+    'https://raw.githubusercontent.com/zunaidhasan/Refactor-proposal-generator/main/database.js'
+  ];
+  for (const url of urls) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      const text = await res.text();
+      const start = text.indexOf('[');
+      const end = text.lastIndexOf(']');
+      if (start < 0 || end < 0) continue;
+      const data = JSON.parse(text.slice(start, end + 1));
+      if (Array.isArray(data) && data.length) return data;
+    } catch (e) {
+      console.warn('[SardarIT] fallback load failed', url, e);
+    }
+  }
+  return null;
+}
+
 function init() {
   const statusDot = document.getElementById('status-dot');
   statusDot.classList.add('loading');
 
-  // Phase 2: prefer enriched DB
-  const sourceDB = (typeof window !== 'undefined' && window.PROJECT_DB && Array.isArray(window.PROJECT_DB))
-    ? window.PROJECT_DB
-    : (typeof PROJECT_DB !== 'undefined' && Array.isArray(PROJECT_DB) ? PROJECT_DB : null);
+  let sourceDB = null;
+  if (typeof window !== 'undefined' && window.PROJECT_DB && Array.isArray(window.PROJECT_DB) && window.PROJECT_DB.length) {
+    sourceDB = window.PROJECT_DB;
+  } else if (typeof PROJECT_DB !== 'undefined' && Array.isArray(PROJECT_DB) && PROJECT_DB.length) {
+    sourceDB = PROJECT_DB;
+  }
 
   if (sourceDB) {
-    state.projects = (typeof enrichDatabase === 'function') ? enrichDatabase(sourceDB) : sourceDB;
-    statusDot.classList.remove('loading');
-    statusDot.classList.add('ready');
-    document.getElementById('db-status-text').textContent = 'Database ready';
-    document.getElementById('stat-count').textContent = state.projects.length.toLocaleString();
-    document.getElementById('info-total').textContent = state.projects.length.toLocaleString();
-    const cats = new Set(state.projects.map(p => getField(p, 'Category')).filter(Boolean));
-    document.getElementById('info-categories').textContent = cats.size;
-    populateFilters();
+    applyLoadedDB(sourceDB);
   } else {
-    statusDot.classList.remove('loading');
-    document.getElementById('db-status-text').textContent = 'No database found';
+    loadDatabaseFallback().then(data => {
+      if (data) {
+        if (typeof window !== 'undefined') window.PROJECT_DB = data;
+        applyLoadedDB(data);
+      } else {
+        statusDot.classList.remove('loading');
+        document.getElementById('db-status-text').textContent = 'No database found';
+        toast('Could not load portfolio database');
+      }
+    });
   }
 
   document.querySelectorAll('.nav-item').forEach(btn => {
