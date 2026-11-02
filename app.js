@@ -1,4 +1,4 @@
-/* ── Sardar IT Reference Engine v3 ─────────────────────────────── */
+/* -- Sardar IT Reference Engine v3 - Polished ------------------- */
 
 const state = {
   view: 'generator',
@@ -10,10 +10,11 @@ const state = {
   category: '',
   tech: '',
   quality: '',
-  complexity: ''
+  complexity: '',
+  live: '',
+  layout: 'grid',
+  loading: false
 };
-
-// ── Helpers ─────────────────────────────────────────────────────
 
 function getField(p, ...keys) {
   for (const k of keys) {
@@ -42,6 +43,13 @@ function normalizeQuality(q) {
   return q;
 }
 
+function isLiveValue(p) {
+  const v = getField(p, 'Is Live', 'is_live');
+  if (v === '' || v === undefined || v === null) return true;
+  if (v === false || v === 'No' || v === 'no' || v === '0' || v === 0) return false;
+  return true;
+}
+
 function toast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg;
@@ -49,7 +57,13 @@ function toast(msg) {
   setTimeout(() => el.classList.remove('show'), 2400);
 }
 
-// ── Navigation ──────────────────────────────────────────────────
+function setButtonLoading(btn, loading) {
+  if (!btn) return;
+  btn.classList.toggle('loading', loading);
+  btn.disabled = loading;
+  const spinner = btn.querySelector('.btn-spinner');
+  if (spinner) spinner.hidden = !loading;
+}
 
 function switchView(view) {
   state.view = view;
@@ -71,13 +85,78 @@ function switchView(view) {
   document.getElementById('page-title').textContent = title;
   document.getElementById('page-subtitle').textContent = sub;
 
-  if (view === 'portfolio') {
-    applyPortfolioFilters(true);
-  }
+  if (view === 'portfolio') applyPortfolioFilters(true);
   lucide.createIcons();
 }
 
-// ── Portfolio ───────────────────────────────────────────────────
+function updateActiveFilterChips() {
+  const bar = document.getElementById('active-filters');
+  const clearBtn = document.getElementById('btn-clear-filters');
+  const chips = [];
+
+  if (state.search) chips.push({ key: 'search', label: `Search: "${state.search.slice(0, 24)}${state.search.length > 24 ? '…' : ''}"` });
+  if (state.category) chips.push({ key: 'category', label: state.category });
+  if (state.tech) chips.push({ key: 'tech', label: state.tech });
+  if (state.quality) chips.push({ key: 'quality', label: `Quality: ${state.quality}` });
+  if (state.complexity) chips.push({ key: 'complexity', label: `Complexity: ${state.complexity}` });
+  if (state.live) chips.push({ key: 'live', label: state.live === 'yes' ? 'Live only' : 'Offline only' });
+
+  if (!chips.length) {
+    bar.hidden = true;
+    bar.innerHTML = '';
+    clearBtn.hidden = true;
+    return;
+  }
+
+  bar.hidden = false;
+  clearBtn.hidden = false;
+  bar.innerHTML = chips.map(c => `
+    <span class="filter-chip" data-key="${c.key}">
+      ${c.label}
+      <button type="button" aria-label="Remove"><i data-lucide="x"></i></button>
+    </span>
+  `).join('');
+  lucide.createIcons();
+
+  bar.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.querySelector('button').addEventListener('click', () => {
+      const key = chip.dataset.key;
+      if (key === 'search') {
+        state.search = '';
+        document.getElementById('portfolio-search').value = '';
+        document.getElementById('search-clear').hidden = true;
+      } else if (key === 'category') {
+        state.category = '';
+        document.getElementById('filter-category').value = '';
+      } else if (key === 'tech') {
+        state.tech = '';
+        document.getElementById('filter-tech').value = '';
+      } else if (key === 'quality') {
+        state.quality = '';
+        document.getElementById('filter-quality').value = '';
+      } else if (key === 'complexity') {
+        state.complexity = '';
+        document.getElementById('filter-complexity').value = '';
+      } else if (key === 'live') {
+        state.live = '';
+        document.getElementById('filter-live').value = '';
+      }
+      applyPortfolioFilters(true);
+    });
+  });
+}
+
+function clearAllFilters() {
+  state.search = state.category = state.tech = state.quality = state.complexity = state.live = '';
+  document.getElementById('portfolio-search').value = '';
+  document.getElementById('search-clear').hidden = true;
+  document.getElementById('filter-category').value = '';
+  document.getElementById('filter-tech').value = '';
+  document.getElementById('filter-quality').value = '';
+  document.getElementById('filter-complexity').value = '';
+  document.getElementById('filter-live').value = '';
+  applyPortfolioFilters(true);
+}
 
 function applyPortfolioFilters(reset = false) {
   if (reset) state.offset = 0;
@@ -98,6 +177,9 @@ function applyPortfolioFilters(reset = false) {
       const c = getField(p, 'Complexity');
       if (c && c !== state.complexity) return false;
     }
+    if (state.live === 'yes' && !isLiveValue(p)) return false;
+    if (state.live === 'no' && isLiveValue(p)) return false;
+
     if (q) {
       const hay = [
         getField(p, 'Website URL'),
@@ -119,21 +201,37 @@ function applyPortfolioFilters(reset = false) {
   });
 
   document.getElementById('portfolio-count').textContent = state.filtered.length.toLocaleString();
+  updateActiveFilterChips();
   renderPortfolioGrid(reset);
 }
 
 function renderPortfolioGrid(reset = false) {
   const grid = document.getElementById('portfolio-grid');
-  if (reset) grid.innerHTML = '';
+  const empty = document.getElementById('portfolio-empty');
+  const moreBtn = document.getElementById('btn-load-more');
+
+  if (reset) {
+    grid.innerHTML = '';
+    state.offset = 0;
+  }
+
+  if (!state.filtered.length) {
+    grid.innerHTML = '';
+    empty.hidden = false;
+    moreBtn.hidden = true;
+    return;
+  }
+  empty.hidden = true;
 
   const slice = state.filtered.slice(state.offset, state.offset + state.limit);
-  slice.forEach(p => {
-    grid.appendChild(createProjectCard(p));
+  slice.forEach((p, i) => {
+    const card = createProjectCard(p);
+    card.style.animationDelay = `${Math.min(i * 0.03, 0.3)}s`;
+    grid.appendChild(card);
   });
 
   state.offset += slice.length;
-  const moreBtn = document.getElementById('btn-load-more');
-  moreBtn.style.display = state.offset < state.filtered.length ? 'inline-flex' : 'none';
+  moreBtn.hidden = state.offset >= state.filtered.length;
   lucide.createIcons();
 }
 
@@ -148,37 +246,56 @@ function createProjectCard(p) {
   const complexity = getField(p, 'Complexity');
   const desc = getField(p, 'Brief Description') || '';
   const strengths = getField(p, 'Strengths') || '';
+  const features = getField(p, 'Website Features') || '';
+  const audience = getField(p, 'Target Audience') || '';
   const keywords = (getField(p, 'Keywords') || '').split(',').map(s => s.trim()).filter(Boolean).slice(0, 5);
-  const isLive = getField(p, 'Is Live');
-
-  const card = document.createElement('article');
-  card.className = 'project-card';
+  const live = isLiveValue(p);
 
   const qualityClass = nq === 'A' || quality === 'High' ? 'quality-a' :
                        nq === 'B' || quality === 'Medium' ? 'quality-b' :
                        nq === 'C' ? 'quality-c' : '';
 
+  const card = document.createElement('article');
+  card.className = 'project-card';
+
   card.innerHTML = `
-    <div class="card-top">
-      <div class="card-title">
-        <a href="${url}" target="_blank" rel="noopener">${name}</a>
+    <div class="card-body">
+      <div class="card-top">
+        <div class="card-title">
+          <a href="${url}" target="_blank" rel="noopener noreferrer">${escapeHtml(name)}</a>
+        </div>
+        <div class="card-badges">
+          ${quality ? `<span class="badge ${qualityClass}">${escapeHtml(nq || quality)}</span>` : ''}
+          ${complexity ? `<span class="badge">${escapeHtml(complexity)}</span>` : ''}
+          ${!live ? `<span class="badge offline">Offline</span>` : ''}
+        </div>
       </div>
-      <div class="card-badges">
-        ${quality ? `<span class="badge ${qualityClass}">${nq || quality}</span>` : ''}
-        ${complexity ? `<span class="badge">${complexity}</span>` : ''}
-        ${isLive === false || isLive === 'No' ? `<span class="badge">Offline</span>` : ''}
+      <div class="card-meta">
+        <span>${escapeHtml(category)}${sub ? ' · ' + escapeHtml(sub) : ''}</span>
+        <span class="dot">·</span>
+        <span>${escapeHtml(mainTech)}</span>
+        ${audience ? `<span class="dot">·</span><span>${escapeHtml(audience)}</span>` : ''}
       </div>
+      ${desc ? `<p class="card-desc">${escapeHtml(desc)}</p>` : ''}
+      ${features ? `<p class="card-features">${escapeHtml(features)}</p>` : ''}
+      ${keywords.length ? `<div class="card-tags">${keywords.map(k => `<span class="tag">${escapeHtml(k)}</span>`).join('')}</div>` : ''}
+      ${strengths ? `<div class="card-strengths"><strong>Strengths:</strong> ${escapeHtml(strengths)}</div>` : ''}
     </div>
-    <div class="card-meta">
-      <span>${category}${sub ? ' · ' + sub : ''}</span>
-      <span>·</span>
-      <span>${mainTech}</span>
+    <div class="card-footer">
+      <a class="card-link" href="${url}" target="_blank" rel="noopener noreferrer">
+        Visit site <i data-lucide="external-link"></i>
+      </a>
     </div>
-    ${desc ? `<p class="card-desc">${desc}</p>` : ''}
-    ${keywords.length ? `<div class="card-tags">${keywords.map(k => `<span class="tag">${k}</span>`).join('')}</div>` : ''}
-    ${strengths ? `<div class="card-strengths"><strong>Strengths:</strong> ${strengths}</div>` : ''}
   `;
   return card;
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&')
+    .replace(/</g, '<')
+    .replace(/>/g, '>')
+    .replace(/"/g, '"');
 }
 
 function populateFilters() {
@@ -200,15 +317,13 @@ function populateFilters() {
     });
   });
   const techSelect = document.getElementById('filter-tech');
-  [...techSet].sort().slice(0, 60).forEach(t => {
+  [...techSet].sort().slice(0, 80).forEach(t => {
     const opt = document.createElement('option');
     opt.value = t;
     opt.textContent = t;
     techSelect.appendChild(opt);
   });
 }
-
-// ── Generator ───────────────────────────────────────────────────
 
 function simpleLocalMatch(brief, limit = 6) {
   const tokens = brief.toLowerCase().split(/\W+/).filter(t => t.length > 3);
@@ -222,7 +337,8 @@ function simpleLocalMatch(brief, limit = 6) {
       getField(p, 'Keywords'),
       getField(p, 'Brief Description'),
       getField(p, 'Use Case', 'Use_Case'),
-      getField(p, 'Strengths')
+      getField(p, 'Strengths'),
+      getField(p, 'Target Audience')
     ].join(' ').toLowerCase();
 
     let score = 0;
@@ -264,34 +380,44 @@ function renderMatchResults(matches) {
 async function handleMatch() {
   const brief = document.getElementById('brief-input').value.trim();
   if (!brief) return toast('Please enter a brief first');
-  const matches = simpleLocalMatch(brief, 8);
-  renderMatchResults(matches);
-  toast(`Found ${matches.length} matches`);
+  const btn = document.getElementById('btn-match');
+  setButtonLoading(btn, true);
+  await new Promise(r => setTimeout(r, 180));
+  try {
+    const matches = simpleLocalMatch(brief, 8);
+    renderMatchResults(matches);
+    toast(`Found ${matches.length} matches`);
+  } finally {
+    setButtonLoading(btn, false);
+  }
 }
 
 async function handleProposal() {
   const brief = document.getElementById('brief-input').value.trim();
   if (!brief) return toast('Please enter a brief first');
 
+  const btn = document.getElementById('btn-proposal');
+  setButtonLoading(btn, true);
   const key = localStorage.getItem('gemini_key');
   const matches = simpleLocalMatch(brief, 3);
 
-  if (!key) {
-    let text = `Hello,\n\nI've reviewed your requirements carefully.\n\n`;
-    text += `I can deliver a solution that matches the scope you described. Below are highly relevant past projects that demonstrate similar work:\n\n`;
-    matches.forEach((p, i) => {
-      text += `${i + 1}. ${projectName(p)}\n   ${getField(p, 'Website URL')}\n`;
-    });
-    text += `\nI'm confident I can meet your expectations on quality, timeline and communication.\n\n`;
-    text += localStorage.getItem('signature') || 'Best regards,\nSardar IT';
-    document.getElementById('output-content').textContent = text;
-    document.getElementById('btn-copy').disabled = false;
-    toast('Draft created (local mode — add Gemini key for full AI)');
-    return;
-  }
-
-  document.getElementById('output-content').innerHTML = `<div class="empty-state"><p>Generating with Gemini…</p></div>`;
   try {
+    if (!key) {
+      await new Promise(r => setTimeout(r, 200));
+      let text = `Hello,\n\nI've reviewed your requirements carefully.\n\n`;
+      text += `I can deliver a solution that matches the scope you described. Below are highly relevant past projects that demonstrate similar work:\n\n`;
+      matches.forEach((p, i) => {
+        text += `${i + 1}. ${projectName(p)}\n   ${getField(p, 'Website URL')}\n`;
+      });
+      text += `\nI'm confident I can meet your expectations on quality, timeline and communication.\n\n`;
+      text += localStorage.getItem('signature') || 'Best regards,\nSardar IT';
+      document.getElementById('output-content').textContent = text;
+      document.getElementById('btn-copy').disabled = false;
+      toast('Draft created (local mode — add Gemini key for full AI)');
+      return;
+    }
+
+    document.getElementById('output-content').innerHTML = `<div class="empty-state"><p>Generating with Gemini…</p></div>`;
     const model = localStorage.getItem('default_model') || 'gemini-2.0-flash';
     const dbSnippet = matches.map(p => ({
       url: getField(p, 'Website URL'),
@@ -336,10 +462,10 @@ Rules:
   } catch (err) {
     document.getElementById('output-content').textContent = 'Error calling Gemini. Check your API key.';
     toast('Gemini error');
+  } finally {
+    setButtonLoading(btn, false);
   }
 }
-
-// ── Settings ────────────────────────────────────────────────────
 
 function loadSettings() {
   document.getElementById('settings-api-key').value = localStorage.getItem('gemini_key') || '';
@@ -354,21 +480,22 @@ function saveSettings() {
   toast('Settings saved');
 }
 
-// ── Init ────────────────────────────────────────────────────────
-
 function init() {
+  const statusDot = document.getElementById('status-dot');
+  statusDot.classList.add('loading');
+
   if (typeof PROJECT_DB !== 'undefined' && Array.isArray(PROJECT_DB)) {
     state.projects = PROJECT_DB;
-    document.getElementById('status-dot').classList.add('ready');
+    statusDot.classList.remove('loading');
+    statusDot.classList.add('ready');
     document.getElementById('db-status-text').textContent = 'Database ready';
     document.getElementById('stat-count').textContent = PROJECT_DB.length.toLocaleString();
     document.getElementById('info-total').textContent = PROJECT_DB.length.toLocaleString();
-
     const cats = new Set(PROJECT_DB.map(p => getField(p, 'Category')).filter(Boolean));
     document.getElementById('info-categories').textContent = cats.size;
-
     populateFilters();
   } else {
+    statusDot.classList.remove('loading');
     document.getElementById('db-status-text').textContent = 'No database found';
   }
 
@@ -407,10 +534,20 @@ function init() {
     navigator.clipboard.writeText(text).then(() => toast('Copied'));
   });
 
-  document.getElementById('portfolio-search').addEventListener('input', e => {
+  const searchInput = document.getElementById('portfolio-search');
+  const searchClear = document.getElementById('search-clear');
+  searchInput.addEventListener('input', e => {
     state.search = e.target.value;
+    searchClear.hidden = !e.target.value;
     applyPortfolioFilters(true);
   });
+  searchClear.addEventListener('click', () => {
+    state.search = '';
+    searchInput.value = '';
+    searchClear.hidden = true;
+    applyPortfolioFilters(true);
+  });
+
   document.getElementById('filter-category').addEventListener('change', e => {
     state.category = e.target.value;
     applyPortfolioFilters(true);
@@ -427,7 +564,32 @@ function init() {
     state.complexity = e.target.value;
     applyPortfolioFilters(true);
   });
-  document.getElementById('btn-load-more').addEventListener('click', () => renderPortfolioGrid(false));
+  document.getElementById('filter-live').addEventListener('change', e => {
+    state.live = e.target.value;
+    applyPortfolioFilters(true);
+  });
+
+  document.getElementById('btn-clear-filters').addEventListener('click', clearAllFilters);
+  document.getElementById('btn-empty-clear').addEventListener('click', clearAllFilters);
+
+  document.getElementById('btn-load-more').addEventListener('click', () => {
+    const btn = document.getElementById('btn-load-more');
+    setButtonLoading(btn, true);
+    setTimeout(() => {
+      renderPortfolioGrid(false);
+      setButtonLoading(btn, false);
+    }, 120);
+  });
+
+  document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.layout = btn.dataset.layout;
+      const grid = document.getElementById('portfolio-grid');
+      grid.classList.toggle('list-layout', state.layout === 'list');
+    });
+  });
 
   loadSettings();
   document.getElementById('btn-save-settings').addEventListener('click', saveSettings);
