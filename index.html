@@ -229,8 +229,8 @@
             <ul class="info-list">
               <li><span>Total References</span><strong id="info-total">—</strong></li>
               <li><span>Categories</span><strong id="info-categories">—</strong></li>
-              <li><span>Schema Version</span><strong>v3 (forward compatible)</strong></li>
-              <li><span>Source</span><strong>Local JSON</strong></li>
+              <li><span>Schema Version</span><strong>v3 (enriched)</strong></li>
+              <li><span>Source</span><strong>Legacy DB + enrich.js</strong></li>
             </ul>
           </div>
 
@@ -248,7 +248,9 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="database.js"></script>
+  <!-- Phase 2: load full legacy DB then enrich to v3 schema -->
+  <script src="https://raw.githubusercontent.com/zunaidhasan/Refactor-proposal-generator/main/database.js"></script>
+  <script src="enrich.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
