@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sardar IT Reference Engine v3</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-mark">S</div>
+        <div class="brand-text">
+          <strong>Sardar IT</strong>
+          <span>Reference Engine</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-view="generator">
+          <i data-lucide="zap"></i>
+          <span>AI Generator</span>
+        </button>
+        <button class="nav-item" data-view="portfolio">
+          <i data-lucide="database"></i>
+          <span>Portfolio</span>
+        </button>
+        <button class="nav-item" data-view="gaps">
+          <i data-lucide="scan-search"></i>
+          <span>Gap Analysis</span>
+          <span class="badge-soon">Soon</span>
+        </button>
+        <button class="nav-item" data-view="testing">
+          <i data-lucide="flask-conical"></i>
+          <span>Testing</span>
+          <span class="badge-soon">Soon</span>
+        </button>
+        <button class="nav-item" data-view="settings">
+          <i data-lucide="settings"></i>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="db-status">
+          <span class="status-dot" id="status-dot"></span>
+          <span id="db-status-text">Loading…</span>
+        </div>
+        <div class="version">v3.0 · Schema Ready</div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1 id="page-title">AI Generator</h1>
+          <p id="page-subtitle">Match briefs against the local reference database and draft proposals</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn-icon" id="theme-toggle" title="Toggle theme">
+            <i data-lucide="moon"></i>
+          </button>
+          <div class="stat-pill">
+            <span id="stat-count">—</span> references
+          </div>
+        </div>
+      </header>
+
+      <!-- VIEW: GENERATOR -->
+      <section class="view active" id="view-generator">
+        <div class="generator-layout">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Client Brief</h2>
+              <span class="hint">Ctrl + Enter to generate</span>
+            </div>
+            <textarea id="brief-input" placeholder="Paste the client requirements or Fiverr brief here…" rows="8"></textarea>
+            <div class="word-count"><span id="word-count">0</span> words</div>
+
+            <div class="quick-chips" id="situation-chips">
+              <button class="chip" data-fill="Client wants a modern WordPress website with Elementor, contact form, blog, responsive design and basic SEO.">WordPress</button>
+              <button class="chip" data-fill="Client needs a Shopify store with product catalog, cart, payment gateway, and clean mobile experience.">Shopify</button>
+              <button class="chip" data-fill="Looking for a custom web application / SaaS dashboard with authentication and admin panel.">Full Stack</button>
+              <button class="chip" data-fill="Need a professional redesign of an existing website focusing on speed, mobile UX and conversion.">Redesign</button>
+            </div>
+
+            <div class="action-row">
+              <button class="btn btn-secondary" id="btn-match">
+                <i data-lucide="compass"></i> Match References
+              </button>
+              <button class="btn btn-primary" id="btn-proposal">
+                <i data-lucide="wand-2"></i> Draft Proposal
+              </button>
+            </div>
+          </div>
+
+          <div class="panel output-panel">
+            <div class="panel-header">
+              <h2>Output</h2>
+              <button class="btn-text" id="btn-copy" disabled>Copy</button>
+            </div>
+            <div id="output-content" class="output-content">
+              <div class="empty-state">
+                <i data-lucide="sparkles"></i>
+                <p>Paste a brief and run <strong>Match References</strong> or <strong>Draft Proposal</strong>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: PORTFOLIO -->
+      <section class="view" id="view-portfolio">
+        <div class="portfolio-toolbar">
+          <div class="search-box">
+            <i data-lucide="search"></i>
+            <input type="text" id="portfolio-search" placeholder="Search URL, description, keywords, stack…" />
+          </div>
+          <div class="filters">
+            <select id="filter-category">
+              <option value="">All Categories</option>
+            </select>
+            <select id="filter-tech">
+              <option value="">All Technologies</option>
+            </select>
+            <select id="filter-quality">
+              <option value="">All Quality</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+            </select>
+            <select id="filter-complexity">
+              <option value="">All Complexity</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+          <div class="results-meta">
+            <span id="portfolio-count">0</span> projects
+          </div>
+        </div>
+
+        <div class="portfolio-grid" id="portfolio-grid">
+          <!-- Cards injected by JS -->
+        </div>
+
+        <div class="load-more-wrap">
+          <button class="btn btn-secondary" id="btn-load-more" style="display:none">Load more</button>
+        </div>
+      </section>
+
+      <!-- VIEW: GAPS (placeholder) -->
+      <section class="view" id="view-gaps">
+        <div class="placeholder-card">
+          <i data-lucide="scan-search"></i>
+          <h2>Gap Analysis</h2>
+          <p>Coming in Phase 3. This view will show missing categories, under-represented stacks, feature gaps, and quality distribution to help you expand the portfolio strategically.</p>
+        </div>
+      </section>
+
+      <!-- VIEW: TESTING (placeholder) -->
+      <section class="view" id="view-testing">
+        <div class="placeholder-card">
+          <i data-lucide="flask-conical"></i>
+          <h2>Testing & Scoring Dashboard</h2>
+          <p>Coming in Phase 3. Run standardized briefs, measure match accuracy, and score how well the reference engine retrieves relevant projects.</p>
+        </div>
+      </section>
+
+      <!-- VIEW: SETTINGS -->
+      <section class="view" id="view-settings">
+        <div class="settings-grid">
+          <div class="panel">
+            <h2>Gemini API</h2>
+            <label class="field">
+              <span>API Key</span>
+              <input type="password" id="settings-api-key" placeholder="Paste your Google AI Studio key" />
+            </label>
+            <label class="field">
+              <span>Model</span>
+              <select id="settings-model">
+                <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+                <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+                <option value="gemini-flash-latest">gemini-flash-latest</option>
+              </select>
+            </label>
+            <button class="btn btn-primary" id="btn-save-settings">Save Settings</button>
+          </div>
+
+          <div class="panel">
+            <h2>Database Info</h2>
+            <ul class="info-list">
+              <li><span>Total References</span><strong id="info-total">—</strong></li>
+              <li><span>Categories</span><strong id="info-categories">—</strong></li>
+              <li><span>Schema Version</span><strong>v3 (forward compatible)</strong></li>
+              <li><span>Source</span><strong>Local JSON</strong></li>
+            </ul>
+          </div>
+
+          <div class="panel">
+            <h2>Proposal Signature</h2>
+            <label class="field">
+              <span>Default sign-off</span>
+              <textarea id="settings-signature" rows="3" placeholder="Best regards,&#10;Zunaid Hasan&#10;Sardar IT"></textarea>
+            </label>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="database.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
