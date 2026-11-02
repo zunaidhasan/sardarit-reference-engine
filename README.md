@@ -2,64 +2,50 @@
 
 **Production-ready Testing Dashboard, Portfolio Explorer & Automated Matching System**
 
-Live (after deploy): `https://zunaidhasan.github.io/sardarit-reference-engine/`
+Live: https://zunaidhasan.github.io/sardarit-reference-engine/
 
 ---
 
-## Purpose
+## Phase 2 complete — Database enrichment
 
-- Validate matching accuracy of portfolio references against client briefs
-- Identify portfolio gaps (missing categories, stacks, features, quality tiers)
-- Generate high-quality proposals using local project intelligence + Gemini
-- Browse and filter a large curated database of real-world projects
+The engine loads the full portfolio (~1,800 unique projects) and **enriches every record client-side** into the v3 schema:
 
-## Target Schema (Phase 2 ready)
-
-| Field | Status |
+| Field | Source |
 |-------|--------|
-| Website URL | ✅ Existing |
-| Project Name | 🔄 New |
-| Category | ✅ Existing |
-| Sub Category | 🔄 New |
-| Main Technology | ✅ Existing |
-| Used Stack | ✅ Existing |
-| Website Features | ✅ Existing |
-| Brief Description | ✅ Existing |
-| Use Case | ✅ Existing |
-| Target Audience | 🔄 New |
-| Keywords | ✅ Existing |
-| Strengths | ✅ Existing |
-| Quality | ✅ Existing (will normalize to A/B/C) |
-| Complexity | 🔄 New |
-| Is Live | 🔄 New |
+| Website URL | Original |
+| Project Name | Generated from domain |
+| Category | Original (cleaned) |
+| Sub Category | Inferred from category + features |
+| Main Technology | Normalized (Other reduced sharply) |
+| Used Stack | Original |
+| Website Features | Original |
+| Brief Description | Original |
+| Use Case | Original |
+| Target Audience | Mapped from category |
+| Keywords | Filled when empty |
+| Strengths | Filled when empty |
+| Quality | Normalized to **A / B / C** |
+| Complexity | Inferred (Low / Medium / High) |
+| Is Live | Default `true` |
 
-## Tech Stack
+Duplicates by URL are removed during enrichment.
+
+## How it loads
+
+1. Full legacy `database.js` from the previous project
+2. `enrich.js` — transforms to v3 schema
+3. `app.js` — UI + matching
+
+## Tech
 
 - Pure client-side (HTML + CSS + Vanilla JS)
-- Local JSON database
-- Google Gemini Flash API (optional, for generation)
-- No backend required
+- Google Gemini Flash for proposal generation (optional)
+- No backend
 
-## Development Roadmap
+## Roadmap
 
-### Phase 1 — UI Upgrade (Current)
-- Modern full-tab dashboard layout
-- Improved Portfolio Explorer with advanced filters
-- Schema-forward project cards
-- Better dark/light theme
-- Cleaner navigation & hierarchy
-
-### Phase 2 — Database Polish
-- Add missing fields (Project Name, Sub Category, Target Audience, Complexity, Is Live)
-- Normalize Quality → A / B / C
-- Fill empty Strengths & Keywords
-- Clean “Other” Main Technology values
-
-### Phase 3 — Testing & Scoring Dashboard
-- Run test briefs and measure match quality
-- Automated gap detection
-- Scoring transparency
-
----
+- [x] Phase 1 — UI upgrade
+- [x] Phase 2 — Database enrichment (schema + normalization)
+- [ ] Phase 3 — Gap Analysis + Testing & Scoring Dashboard
 
 **Previous version:** [Refactor-proposal-generator](https://github.com/zunaidhasan/Refactor-proposal-generator)
