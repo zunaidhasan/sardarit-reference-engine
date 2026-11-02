@@ -34,12 +34,10 @@
         <button class="nav-item" data-view="gaps">
           <i data-lucide="scan-search"></i>
           <span>Gap Analysis</span>
-          <span class="badge-soon">Soon</span>
         </button>
         <button class="nav-item" data-view="testing">
           <i data-lucide="flask-conical"></i>
           <span>Testing</span>
-          <span class="badge-soon">Soon</span>
         </button>
         <button class="nav-item" data-view="settings">
           <i data-lucide="settings"></i>
@@ -52,7 +50,7 @@
           <span class="status-dot" id="status-dot"></span>
           <span id="db-status-text">Loading…</span>
         </div>
-        <div class="version">v3.0 · Schema Ready</div>
+        <div class="version">v3.0 · Phase 3</div>
       </div>
     </aside>
 
@@ -129,12 +127,8 @@
           </div>
 
           <div class="filters" id="filter-bar">
-            <select id="filter-category">
-              <option value="">All Categories</option>
-            </select>
-            <select id="filter-tech">
-              <option value="">All Technologies</option>
-            </select>
+            <select id="filter-category"><option value="">All Categories</option></select>
+            <select id="filter-tech"><option value="">All Technologies</option></select>
             <select id="filter-quality">
               <option value="">All Quality</option>
               <option value="High">High / A</option>
@@ -156,31 +150,22 @@
 
           <div class="toolbar-right">
             <button class="btn-text" id="btn-clear-filters" hidden>Clear filters</button>
-            <div class="results-meta">
-              <span id="portfolio-count">0</span> projects
-            </div>
+            <div class="results-meta"><span id="portfolio-count">0</span> projects</div>
             <div class="view-toggle">
-              <button class="view-btn active" data-layout="grid" title="Grid">
-                <i data-lucide="layout-grid"></i>
-              </button>
-              <button class="view-btn" data-layout="list" title="List">
-                <i data-lucide="list"></i>
-              </button>
+              <button class="view-btn active" data-layout="grid" title="Grid"><i data-lucide="layout-grid"></i></button>
+              <button class="view-btn" data-layout="list" title="List"><i data-lucide="list"></i></button>
             </div>
           </div>
         </div>
 
         <div class="active-filters" id="active-filters" hidden></div>
-
         <div class="portfolio-grid" id="portfolio-grid"></div>
-
         <div class="portfolio-empty" id="portfolio-empty" hidden>
           <i data-lucide="search-x"></i>
           <h3>No projects match</h3>
           <p>Try different filters or clear the search.</p>
           <button class="btn btn-secondary" id="btn-empty-clear">Clear all filters</button>
         </div>
-
         <div class="load-more-wrap">
           <button class="btn btn-secondary" id="btn-load-more" hidden>
             <span class="btn-label">Load more</span>
@@ -190,18 +175,65 @@
       </section>
 
       <section class="view" id="view-gaps">
-        <div class="placeholder-card">
-          <i data-lucide="scan-search"></i>
-          <h2>Gap Analysis</h2>
-          <p>Coming in Phase 3. This view will show missing categories, under-represented stacks, feature gaps, and quality distribution to help you expand the portfolio strategically.</p>
+        <div class="phase3-toolbar">
+          <button class="btn btn-secondary" id="btn-refresh-gaps">
+            <i data-lucide="refresh-cw"></i>
+            <span>Refresh Analysis</span>
+          </button>
+        </div>
+        <div class="kpi-row" id="gaps-kpi"></div>
+        <div class="gaps-grid">
+          <div class="panel"><div class="panel-header"><h2>Category Coverage</h2></div><div id="gaps-categories" class="bar-list"></div></div>
+          <div class="panel"><div class="panel-header"><h2>Main Technology</h2></div><div id="gaps-tech" class="bar-list"></div></div>
+          <div class="panel"><div class="panel-header"><h2>Quality Mix</h2></div><div id="gaps-quality" class="bar-list"></div></div>
+          <div class="panel"><div class="panel-header"><h2>Complexity Mix</h2></div><div id="gaps-complexity" class="bar-list"></div></div>
+        </div>
+        <div class="gaps-grid gaps-grid-2">
+          <div class="panel"><div class="panel-header"><h2>Under-represented Areas</h2></div><div id="gaps-under" class="gap-cards"></div></div>
+          <div class="panel"><div class="panel-header"><h2>Feature Coverage</h2></div><div id="gaps-features" class="bar-list"></div></div>
+        </div>
+        <div class="panel" style="margin-top:20px">
+          <div class="panel-header"><h2>Expansion Recommendations</h2></div>
+          <ul id="gaps-recommendations" class="rec-list"></ul>
         </div>
       </section>
 
       <section class="view" id="view-testing">
-        <div class="placeholder-card">
-          <i data-lucide="flask-conical"></i>
-          <h2>Testing & Scoring Dashboard</h2>
-          <p>Coming in Phase 3. Run standardized briefs, measure match accuracy, and score how well the reference engine retrieves relevant projects.</p>
+        <div class="testing-layout">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Test Briefs</h2>
+              <button class="btn-text" id="btn-run-all-tests">Run all</button>
+            </div>
+            <div class="test-brief-list" id="test-brief-list"></div>
+            <div class="field" style="margin-top:14px">
+              <span>Custom brief</span>
+              <textarea id="custom-test-brief" rows="3" placeholder="Paste a custom client brief to score…"></textarea>
+            </div>
+            <button class="btn btn-primary" id="btn-run-custom-test" style="margin-top:10px">
+              <i data-lucide="play"></i>
+              <span class="btn-label">Score Custom Brief</span>
+              <span class="btn-spinner" hidden></span>
+            </button>
+          </div>
+          <div class="panel output-panel">
+            <div class="panel-header">
+              <h2>Scoring Results</h2>
+              <span class="hint" id="test-score-summary"></span>
+            </div>
+            <div id="test-results" class="test-results">
+              <div class="empty-state">
+                <i data-lucide="flask-conical"></i>
+                <p>Select a test brief or run all tests to see match scores.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel" style="margin-top:20px">
+          <div class="panel-header"><h2>Suite Scoreboard</h2></div>
+          <div class="scoreboard" id="scoreboard">
+            <div class="empty-state" style="padding:24px"><p>Run the test suite to populate scores.</p></div>
+          </div>
         </div>
       </section>
 
@@ -209,12 +241,8 @@
         <div class="settings-grid">
           <div class="panel">
             <h2>Gemini API</h2>
-            <label class="field">
-              <span>API Key</span>
-              <input type="password" id="settings-api-key" placeholder="Paste your Google AI Studio key" />
-            </label>
-            <label class="field">
-              <span>Model</span>
+            <label class="field"><span>API Key</span><input type="password" id="settings-api-key" placeholder="Paste your Google AI Studio key" /></label>
+            <label class="field"><span>Model</span>
               <select id="settings-model">
                 <option value="gemini-2.0-flash">gemini-2.0-flash</option>
                 <option value="gemini-1.5-flash">gemini-1.5-flash</option>
@@ -223,7 +251,6 @@
             </label>
             <button class="btn btn-primary" id="btn-save-settings">Save Settings</button>
           </div>
-
           <div class="panel">
             <h2>Database Info</h2>
             <ul class="info-list">
@@ -233,11 +260,9 @@
               <li><span>Source</span><strong>Legacy DB + enrich.js</strong></li>
             </ul>
           </div>
-
           <div class="panel">
             <h2>Proposal Signature</h2>
-            <label class="field">
-              <span>Default sign-off</span>
+            <label class="field"><span>Default sign-off</span>
               <textarea id="settings-signature" rows="3" placeholder="Best regards,&#10;Zunaid Hasan&#10;Sardar IT"></textarea>
             </label>
           </div>
@@ -248,7 +273,6 @@
 
   <div class="toast" id="toast"></div>
 
-  <!-- Phase 2: load full DB (jsDelivr = correct JS MIME) then enrich -->
   <script src="https://cdn.jsdelivr.net/gh/zunaidhasan/Refactor-proposal-generator@main/database.js"></script>
   <script src="enrich.js"></script>
   <script src="app.js"></script>
