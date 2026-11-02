@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="phase3.css" />
+  <link rel="stylesheet" href="phase4.css" />
   <link rel="icon" type="image/png" href="icon.png" />
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -22,39 +23,21 @@
           <span>Reference Engine</span>
         </div>
       </div>
-
       <nav class="sidebar-nav">
-        <button class="nav-item active" data-view="generator">
-          <i data-lucide="zap"></i>
-          <span>AI Generator</span>
-        </button>
-        <button class="nav-item" data-view="portfolio">
-          <i data-lucide="database"></i>
-          <span>Portfolio</span>
-        </button>
-        <button class="nav-item" data-view="gaps">
-          <i data-lucide="scan-search"></i>
-          <span>Gap Analysis</span>
-        </button>
-        <button class="nav-item" data-view="testing">
-          <i data-lucide="flask-conical"></i>
-          <span>Testing</span>
-        </button>
-        <button class="nav-item" data-view="settings">
-          <i data-lucide="settings"></i>
-          <span>Settings</span>
-        </button>
+        <button class="nav-item active" data-view="generator"><i data-lucide="zap"></i><span>AI Generator</span></button>
+        <button class="nav-item" data-view="portfolio"><i data-lucide="database"></i><span>Portfolio</span></button>
+        <button class="nav-item" data-view="gaps"><i data-lucide="scan-search"></i><span>Gap Analysis</span></button>
+        <button class="nav-item" data-view="testing"><i data-lucide="flask-conical"></i><span>Testing</span></button>
+        <button class="nav-item" data-view="settings"><i data-lucide="settings"></i><span>Settings</span></button>
       </nav>
-
       <div class="sidebar-footer">
         <div class="db-status">
           <span class="status-dot" id="status-dot"></span>
           <span id="db-status-text">Loading…</span>
         </div>
-        <div class="version">v3.0 · Phase 3</div>
+        <div class="version">v3.0 · Phase 4</div>
       </div>
     </aside>
-
     <main class="main">
       <header class="topbar">
         <div>
@@ -62,57 +45,31 @@
           <p id="page-subtitle">Match briefs against the local reference database and draft proposals</p>
         </div>
         <div class="topbar-actions">
-          <button class="btn-icon" id="theme-toggle" title="Toggle theme">
-            <i data-lucide="moon"></i>
-          </button>
-          <div class="stat-pill">
-            <span id="stat-count">—</span> references
-          </div>
+          <button class="btn-icon" id="theme-toggle" title="Toggle theme"><i data-lucide="moon"></i></button>
+          <div class="stat-pill"><span id="stat-count">—</span> references</div>
         </div>
       </header>
 
       <section class="view active" id="view-generator">
         <div class="generator-layout">
           <div class="panel">
-            <div class="panel-header">
-              <h2>Client Brief</h2>
-              <span class="hint">Ctrl + Enter to generate</span>
-            </div>
+            <div class="panel-header"><h2>Client Brief</h2><span class="hint">Ctrl + Enter to generate</span></div>
             <textarea id="brief-input" placeholder="Paste the client requirements or Fiverr brief here…" rows="8"></textarea>
             <div class="word-count"><span id="word-count">0</span> words</div>
-
             <div class="quick-chips" id="situation-chips">
               <button class="chip" data-fill="Client wants a modern WordPress website with Elementor, contact form, blog, responsive design and basic SEO.">WordPress</button>
               <button class="chip" data-fill="Client needs a Shopify store with product catalog, cart, payment gateway, and clean mobile experience.">Shopify</button>
               <button class="chip" data-fill="Looking for a custom web application / SaaS dashboard with authentication and admin panel.">Full Stack</button>
               <button class="chip" data-fill="Need a professional redesign of an existing website focusing on speed, mobile UX and conversion.">Redesign</button>
             </div>
-
             <div class="action-row">
-              <button class="btn btn-secondary" id="btn-match">
-                <i data-lucide="compass"></i>
-                <span class="btn-label">Match References</span>
-                <span class="btn-spinner" hidden></span>
-              </button>
-              <button class="btn btn-primary" id="btn-proposal">
-                <i data-lucide="wand-2"></i>
-                <span class="btn-label">Draft Proposal</span>
-                <span class="btn-spinner" hidden></span>
-              </button>
+              <button class="btn btn-secondary" id="btn-match"><i data-lucide="compass"></i><span class="btn-label">Match References</span><span class="btn-spinner" hidden></span></button>
+              <button class="btn btn-primary" id="btn-proposal"><i data-lucide="wand-2"></i><span class="btn-label">Draft Proposal</span><span class="btn-spinner" hidden></span></button>
             </div>
           </div>
-
           <div class="panel output-panel">
-            <div class="panel-header">
-              <h2>Output</h2>
-              <button class="btn-text" id="btn-copy" disabled>Copy</button>
-            </div>
-            <div id="output-content" class="output-content">
-              <div class="empty-state">
-                <i data-lucide="sparkles"></i>
-                <p>Paste a brief and run <strong>Match References</strong> or <strong>Draft Proposal</strong>.</p>
-              </div>
-            </div>
+            <div class="panel-header"><h2>Output</h2><button class="btn-text" id="btn-copy" disabled>Copy</button></div>
+            <div id="output-content" class="output-content"><div class="empty-state"><i data-lucide="sparkles"></i><p>Paste a brief and run <strong>Match References</strong> or <strong>Draft Proposal</strong>.</p></div></div>
           </div>
         </div>
       </section>
@@ -122,33 +79,15 @@
           <div class="search-box">
             <i data-lucide="search"></i>
             <input type="text" id="portfolio-search" placeholder="Search URL, name, description, keywords, stack…" autocomplete="off" />
-            <button class="search-clear" id="search-clear" title="Clear" hidden>
-              <i data-lucide="x"></i>
-            </button>
+            <button class="search-clear" id="search-clear" title="Clear" hidden><i data-lucide="x"></i></button>
           </div>
-
           <div class="filters" id="filter-bar">
             <select id="filter-category"><option value="">All Categories</option></select>
             <select id="filter-tech"><option value="">All Technologies</option></select>
-            <select id="filter-quality">
-              <option value="">All Quality</option>
-              <option value="High">High / A</option>
-              <option value="Medium">Medium / B</option>
-              <option value="C">C</option>
-            </select>
-            <select id="filter-complexity">
-              <option value="">All Complexity</option>
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
-            </select>
-            <select id="filter-live">
-              <option value="">Live status</option>
-              <option value="yes">Live only</option>
-              <option value="no">Offline only</option>
-            </select>
+            <select id="filter-quality"><option value="">All Quality</option><option value="High">High / A</option><option value="Medium">Medium / B</option><option value="C">C</option></select>
+            <select id="filter-complexity"><option value="">All Complexity</option><option value="Low">Low</option><option value="Medium">Medium</option><option value="High">High</option></select>
+            <select id="filter-live"><option value="">Live status</option><option value="yes">Live only</option><option value="no">Offline only</option></select>
           </div>
-
           <div class="toolbar-right">
             <button class="btn-text" id="btn-clear-filters" hidden>Clear filters</button>
             <div class="results-meta"><span id="portfolio-count">0</span> projects</div>
@@ -158,29 +97,18 @@
             </div>
           </div>
         </div>
-
         <div class="active-filters" id="active-filters" hidden></div>
         <div class="portfolio-grid" id="portfolio-grid"></div>
         <div class="portfolio-empty" id="portfolio-empty" hidden>
-          <i data-lucide="search-x"></i>
-          <h3>No projects match</h3>
-          <p>Try different filters or clear the search.</p>
+          <i data-lucide="search-x"></i><h3>No projects match</h3><p>Try different filters or clear the search.</p>
           <button class="btn btn-secondary" id="btn-empty-clear">Clear all filters</button>
         </div>
-        <div class="load-more-wrap">
-          <button class="btn btn-secondary" id="btn-load-more" hidden>
-            <span class="btn-label">Load more</span>
-            <span class="btn-spinner" hidden></span>
-          </button>
-        </div>
+        <div class="load-more-wrap"><button class="btn btn-secondary" id="btn-load-more" hidden><span class="btn-label">Load more</span><span class="btn-spinner" hidden></span></button></div>
       </section>
 
       <section class="view" id="view-gaps">
         <div class="phase3-toolbar">
-          <button class="btn btn-secondary" id="btn-refresh-gaps">
-            <i data-lucide="refresh-cw"></i>
-            <span>Refresh Analysis</span>
-          </button>
+          <button class="btn btn-secondary" id="btn-refresh-gaps"><i data-lucide="refresh-cw"></i><span>Refresh Analysis</span></button>
         </div>
         <div class="kpi-row" id="gaps-kpi"></div>
         <div class="gaps-grid">
@@ -197,36 +125,55 @@
           <div class="panel-header"><h2>Expansion Recommendations</h2></div>
           <ul id="gaps-recommendations" class="rec-list"></ul>
         </div>
+
+        <div class="panel ai-gap-panel" style="margin-top:20px">
+          <div class="panel-header">
+            <h2>AI-Driven Insights</h2>
+            <button class="btn btn-primary" id="btn-ai-gaps">
+              <i data-lucide="wand-2"></i>
+              <span class="btn-label">Analyze with AI</span>
+              <span class="btn-spinner" hidden></span>
+            </button>
+          </div>
+          <p class="ai-gap-hint">Uses your Gemini key (Settings) to turn portfolio stats into a prioritized growth plan for Fiverr/Upwork demand.</p>
+          <div id="ai-gap-output" class="ai-gap-output">
+            <div class="empty-state" style="padding:28px">
+              <p>Run statistical analysis first, then click <strong>Analyze with AI</strong> for strategic recommendations.</p>
+            </div>
+          </div>
+          <div class="ai-gap-ask" style="margin-top:16px">
+            <div class="field">
+              <span>Ask about portfolio gaps</span>
+              <div class="ai-ask-row">
+                <input type="text" id="ai-gap-question" placeholder="e.g. What niches should I prioritize for $500–1500 web projects?" />
+                <button class="btn btn-secondary" id="btn-ai-ask">
+                  <i data-lucide="send"></i>
+                  <span class="btn-label">Ask</span>
+                  <span class="btn-spinner" hidden></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section class="view" id="view-testing">
         <div class="testing-layout">
           <div class="panel">
-            <div class="panel-header">
-              <h2>Test Briefs</h2>
-              <button class="btn-text" id="btn-run-all-tests">Run all</button>
-            </div>
+            <div class="panel-header"><h2>Test Briefs</h2><button class="btn-text" id="btn-run-all-tests">Run all</button></div>
             <div class="test-brief-list" id="test-brief-list"></div>
             <div class="field" style="margin-top:14px">
               <span>Custom brief</span>
               <textarea id="custom-test-brief" rows="3" placeholder="Paste a custom client brief to score…"></textarea>
             </div>
             <button class="btn btn-primary" id="btn-run-custom-test" style="margin-top:10px">
-              <i data-lucide="play"></i>
-              <span class="btn-label">Score Custom Brief</span>
-              <span class="btn-spinner" hidden></span>
+              <i data-lucide="play"></i><span class="btn-label">Score Custom Brief</span><span class="btn-spinner" hidden></span>
             </button>
           </div>
           <div class="panel output-panel">
-            <div class="panel-header">
-              <h2>Scoring Results</h2>
-              <span class="hint" id="test-score-summary"></span>
-            </div>
+            <div class="panel-header"><h2>Scoring Results</h2><span class="hint" id="test-score-summary"></span></div>
             <div id="test-results" class="test-results">
-              <div class="empty-state">
-                <i data-lucide="flask-conical"></i>
-                <p>Select a test brief or run all tests to see match scores.</p>
-              </div>
+              <div class="empty-state"><p>Select a test brief or run all tests to see match scores.</p></div>
             </div>
           </div>
         </div>
@@ -271,12 +218,11 @@
       </section>
     </main>
   </div>
-
   <div class="toast" id="toast"></div>
-
   <script src="https://cdn.jsdelivr.net/gh/zunaidhasan/Refactor-proposal-generator@main/database.js"></script>
   <script src="enrich.js"></script>
   <script src="app.js"></script>
   <script src="phase3.js"></script>
+  <script src="phase4.js"></script>
 </body>
 </html>
