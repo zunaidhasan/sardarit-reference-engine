@@ -1,1 +1,48 @@
-PLACEHOLDER_INDEX
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sardar IT Reference Engine v3</title>
+  <link rel="icon" type="image/png" href="icon.png" />
+  <style>
+    body { margin:0; background:#0b0f19; color:#f1f5f9; font-family: system-ui,sans-serif; display:grid; place-items:center; min-height:100vh; }
+    .boot { opacity:.7; font-size:14px; }
+  </style>
+</head>
+<body>
+  <p class="boot">Loading Sardar IT Reference Engine…</p>
+  <script>
+  (async function () {
+    try {
+      const urls = [
+        'https://cdn.jsdelivr.net/gh/zunaidhasan/sardarit-reference-engine@9174012f76/index.html',
+        'https://raw.githubusercontent.com/zunaidhasan/sardarit-reference-engine/9174012f76/index.html'
+      ];
+      let html = null;
+      for (const u of urls) {
+        try {
+          const r = await fetch(u, { cache: 'no-store' });
+          if (r.ok) { html = await r.text(); if (html && html.indexOf('portfolio-grid') >= 0) break; }
+        } catch (e) {}
+      }
+      if (!html) { document.body.innerHTML = '<p>Failed to load app shell. Hard-refresh or check network.</p>'; return; }
+      html = html.replace(
+        /<div class="brand-mark">S<\/div>/,
+        '<img class="brand-logo" src="icon.png" alt="Sardar IT" width="36" height="36" />'
+      );
+      html = html.replace('src="app.js"', 'src="app.js?v=bootstrap"');
+      html = html.replace('href="styles.css"', 'href="styles.css?v=logo"');
+      if (html.indexOf('polished-loader.js') < 0) {
+        html = html.replace('</body>', '<script src="polished-loader.js"><\/script></body>');
+      }
+      document.open();
+      document.write(html);
+      document.close();
+    } catch (err) {
+      document.body.innerHTML = '<p>Boot error: ' + err.message + '</p>';
+    }
+  })();
+  </script>
+</body>
+</html>
