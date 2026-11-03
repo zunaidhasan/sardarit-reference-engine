@@ -44,7 +44,7 @@
 
   function rowsToObjects(rows) {
     if (!rows.length) return [];
-    const headers = rows[0].map(h => h.trim());
+    const headers = rows[0].map(h => (h || '').trim().replace(/^\uFEFF/, ''));
     const out = [];
     for (let r = 1; r < rows.length; r++) {
       const cells = rows[r];
@@ -58,18 +58,25 @@
 
   async function fetchText(path) {
     const bases = [
-      '', './',
       'https://cdn.jsdelivr.net/gh/zunaidhasan/sardarit-reference-engine@main/',
-      'https://raw.githubusercontent.com/zunaidhasan/sardarit-reference-engine/main/'
+      'https://raw.githubusercontent.com/zunaidhasan/sardarit-reference-engine/main/',
+      '',
+      './'
     ];
     for (const b of bases) {
       try {
-        const res = await fetch(b + path, { cache: 'no-store' });
+        const url = b + path;
+        const res = await fetch(url, { cache: 'no-store' });
         if (res.ok) {
           const t = await res.text();
-          if (t && t.length > 100 && t.includes('Website URL')) return t;
+          if (t && t.length > 100 && (t.includes('Website URL') || t.includes('Project Name'))) {
+            console.log('[SardarIT] fetched', url, t.length, 'bytes');
+            return t;
+          }
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn('[SardarIT] fetch failed', b + path, e.message);
+      }
     }
     return null;
   }
@@ -80,12 +87,25 @@
       console.log('[SardarIT] Polished DB from JS parts →', data.length);
       return data;
     }
-    const text = await fetchText('database-polished.csv');
-    if (text) {
+
+    // Uploaded filename has a space: "Polished database.csv"
+    const candidates = [
+      'Polished%20database.csv',
+      'Polished database.csv',
+      'database-polished.csv',
+      'polished-database.csv'
+    ];
+
+    for (const name of candidates) {
+      const text = await fetchText(name);
+      if (!text) continue;
       const data = dedupe(rowsToObjects(parseCSV(text)));
-      console.log('[SardarIT] Polished DB from CSV →', data.length);
-      return data;
+      if (data.length) {
+        console.log('[SardarIT] Polished DB from', name, '→', data.length);
+        return data;
+      }
     }
+    console.error('[SardarIT] No polished CSV found');
     return null;
   };
 
@@ -93,7 +113,13 @@
 
   function hydrate() {
     window.loadPolishedDatabase().then(data => {
-      if (!data || !data.length) return;
+      if (!data || !data.length) {
+        const status = document.getElementById('db-status-text');
+        if (status && (status.textContent || '').includes('Loading')) {
+          status.textContent = 'No database found';
+        }
+        return;
+      }
       if (typeof applyLoadedDB === 'function') {
         applyLoadedDB(data);
         return;
@@ -107,13 +133,16 @@
         const dot = document.getElementById('status-dot');
         if (dot) { dot.classList.remove('loading'); dot.classList.add('ready'); }
         if (typeof populateFilters === 'function') populateFilters();
+        if (typeof toast === 'function') toast(state.projects.length + ' polished projects loaded');
       }
+    }).catch(err => {
+      console.error('[SardarIT] hydrate error', err);
     });
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(hydrate, 80));
+    document.addEventListener('DOMContentLoaded', () => setTimeout(hydrate, 100));
   } else {
-    setTimeout(hydrate, 80);
+    setTimeout(hydrate, 100);
   }
 })();
